@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -11,12 +12,16 @@ import android.view.View;
 
 import java.util.Calendar;
 
+import static com.view_clock.MainActivity.StringData;
+
 /**
  * 作者：李飞 on 2017/5/5 09:12
  * 类的用途：
  */
 
 public class ClockView extends View {
+    //监听事件
+
 
     //View默认最小宽度
     private static final int DEFAULT_MIN_WIDTH = 200;
@@ -122,6 +127,21 @@ public class ClockView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         reset();
+
+
+        //画 button
+        Paint paintButton = new Paint();
+        paintButton.setColor(Color.RED);
+        paintButton.setTextSize(30);
+        paintButton.setAntiAlias(true);
+        paintButton.setStyle(Paint.Style.STROKE);
+        // 画圆角矩形(RectF)
+        RectF rectrf = new RectF(130, 180, 250, 250);
+        canvas.drawRoundRect(rectrf,30, 30, paintButton);  // 画圆角矩形(RectF)
+        String data = StringData();
+        canvas.drawText(data,150,230,paintButton);
+
+
         //画外圆
         float borderWidth = DEFAULT_BORDER_WIDTH;
         float r = Math.min(getHeight() / 2, getWidth() / 2) - borderWidth / 2;
@@ -143,7 +163,9 @@ public class ClockView extends View {
                 paintDegree.setStrokeWidth(3);
                 degreeLength = DEFAULT_SHORT_DEGREE_LENGTH;
             }
+            //划线
             canvas.drawLine(getWidth()/2, Math.abs(getHeight()/2 - r), getWidth()/2,Math.abs(getHeight()/2 - r) + degreeLength, paintDegree);
+            //旋转
             canvas.rotate(360/60, getWidth()/2, getHeight()/2);
         }
 
@@ -151,9 +173,9 @@ public class ClockView extends View {
         int degressNumberSize = 30;
         canvas.translate(getWidth() / 2, getHeight() / 2);
         Paint paintDegreeNumber = new Paint();
-        paintDegreeNumber.setTextAlign(Paint.Align.CENTER);
-        paintDegreeNumber.setTextSize(degressNumberSize);
-        paintDegreeNumber.setFakeBoldText(true);
+        paintDegreeNumber.setTextAlign(Paint.Align.CENTER); //中心对齐
+        paintDegreeNumber.setTextSize(degressNumberSize);  //字体大小
+        paintDegreeNumber.setFakeBoldText(true);  //粗体文字
         for(int i=0;i<12;i++){
             float[] temp = calculatePoint((i+1)*30, r - DEFAULT_LONG_DEGREE_LENGTH - degressNumberSize/2 - 15);
             canvas.drawText((i+1)+"", temp[2], temp[3] + degressNumberSize/2-6, paintDegreeNumber);
@@ -170,6 +192,7 @@ public class ClockView extends View {
         paintSecond.setAntiAlias(true);
         paintSecond.setStrokeWidth(5);
         Calendar now = Calendar.getInstance();
+        //now.get(Calendar.HOUR_OF_DAY)  当前 时间（24）
         float[] hourPoints = calculatePoint(now.get(Calendar.HOUR_OF_DAY)%12/12f*360, hourPointerLength);
         canvas.drawLine(hourPoints[0], hourPoints[1], hourPoints[2], hourPoints[3], paintHour);
         float[] minutePoints = calculatePoint(now.get(Calendar.MINUTE)/60f*360, minutePointerLength);
@@ -180,7 +203,11 @@ public class ClockView extends View {
         //画圆心
         Paint paintCenter = new Paint();
         paintCenter.setColor(Color.WHITE);
-        canvas.drawCircle(0, 0, 2, paintCenter);
+        canvas.drawCircle(0,0, 2, paintCenter);  //圆心 0,0 ？
+
+
+
+
     }
 
     /**
@@ -206,4 +233,9 @@ public class ClockView extends View {
         }
         return result;
     }
+
+
+    // 监听
+
+
 }
